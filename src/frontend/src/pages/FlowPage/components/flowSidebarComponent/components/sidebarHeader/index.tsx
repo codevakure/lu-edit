@@ -8,7 +8,7 @@ import {
   DisclosureContent,
   DisclosureTrigger,
 } from "@/components/ui/disclosure";
-import { SidebarHeader, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarHeader } from "@/components/ui/sidebar";
 import type { SidebarHeaderComponentProps } from "../../types";
 import FeatureToggles from "../featureTogglesComponent";
 import { SearchInput } from "../searchInput";
@@ -36,10 +36,16 @@ export const SidebarHeaderComponent = memo(function SidebarHeaderComponent({
     <SidebarHeader className="flex w-full flex-col gap-4 p-4 pb-1">
       <Disclosure open={showConfig} onOpenChange={setShowConfig}>
         <div className="flex w-full items-center gap-2">
-          <SidebarTrigger className="text-muted-foreground">
-            <ForwardedIconComponent name="PanelLeftClose" />
-          </SidebarTrigger>
-          <h3 className="flex-1 text-sm font-semibold">Components</h3>
+          <div className="flex-1">
+            <SearchInput
+              searchInputRef={searchInputRef}
+              isInputFocused={isInputFocused}
+              search={search}
+              handleInputFocus={handleInputFocus}
+              handleInputBlur={handleInputBlur}
+              handleInputChange={handleInputChange}
+            />
+          </div>
           <DisclosureTrigger>
             <div>
               <ShadTooltip content="Component settings" styleClasses="z-50">
@@ -66,14 +72,6 @@ export const SidebarHeaderComponent = memo(function SidebarHeaderComponent({
           />
         </DisclosureContent>
       </Disclosure>
-      <SearchInput
-        searchInputRef={searchInputRef}
-        isInputFocused={isInputFocused}
-        search={search}
-        handleInputFocus={handleInputFocus}
-        handleInputBlur={handleInputBlur}
-        handleInputChange={handleInputChange}
-      />
       {filterType && (
         <SidebarFilterComponent
           isInput={!!filterType.source}

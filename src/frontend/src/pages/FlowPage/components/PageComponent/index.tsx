@@ -718,7 +718,7 @@ export default function Page({
               <FlowToolbar />
             </>
           )}
-          <MemoizedSidebarTrigger />
+          <MemoizedSidebarTrigger isLoading={!showCanvas} />
           <SelectionMenu
             lastSelection={lastSelection}
             isVisible={selectionMenuVisible}
