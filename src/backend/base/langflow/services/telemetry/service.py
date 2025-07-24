@@ -6,7 +6,6 @@ import platform
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-import httpx
 from loguru import logger
 
 from langflow.services.base import Service
@@ -32,9 +31,7 @@ class TelemetryService(Service):
     def __init__(self, settings_service: SettingsService):
         super().__init__()
         self.settings_service = settings_service
-        self.base_url = settings_service.settings.telemetry_base_url
         self.telemetry_queue: asyncio.Queue = asyncio.Queue()
-        self.client = httpx.AsyncClient(timeout=10.0)  # Set a reasonable timeout
         self.running = False
         self._stopping = False
 
@@ -62,22 +59,20 @@ class TelemetryService(Service):
             logger.debug("Telemetry tracking is disabled.")
             return
 
-        url = f"{self.base_url}"
-        if path:
-            url = f"{url}/{path}"
-        try:
-            payload_dict = payload.model_dump(by_alias=True, exclude_none=True, exclude_unset=True)
-            response = await self.client.get(url, params=payload_dict)
-            if response.status_code != httpx.codes.OK:
-                logger.error(f"Failed to send telemetry data: {response.status_code} {response.text}")
-            else:
-                logger.debug("Telemetry data sent successfully.")
-        except httpx.HTTPStatusError:
-            logger.error("HTTP error occurred")
-        except httpx.RequestError:
-            logger.error("Request error occurred")
-        except Exception:  # noqa: BLE001
-            logger.error("Unexpected error occurred")
+        # PLACEHOLDER: Log telemetry data instead of sending to external service
+        # In the future, this can be configured to send to analytics services like:
+        # - Google Analytics
+        # - Mixpanel
+        # - Amplitude
+        # - Custom analytics endpoints
+        # - Business intelligence platforms
+        
+        endpoint = path or "version"
+        payload_dict = payload.model_dump(by_alias=True, exclude_none=True, exclude_unset=True)
+        
+        logger.info(f"[TELEMETRY] Endpoint: {endpoint}")
+        logger.info(f"[TELEMETRY] Payload: {payload_dict}")
+        logger.debug("Telemetry data logged successfully.")
 
     async def log_package_run(self, payload: RunPayload) -> None:
         await self._queue_event((self.send_telemetry_data, payload, "run"))
@@ -159,7 +154,7 @@ class TelemetryService(Service):
                 await self._cancel_task(self.worker_task, "Cancel telemetry worker task")
             if self.log_package_version_task:
                 await self._cancel_task(self.log_package_version_task, "Cancel telemetry log package version task")
-            await self.client.aclose()
+            # HTTP client no longer needed since we're logging instead of sending requests
         except Exception:  # noqa: BLE001
             logger.exception("Error stopping tracing service")
 
