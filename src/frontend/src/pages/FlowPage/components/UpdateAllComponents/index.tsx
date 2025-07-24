@@ -17,7 +17,7 @@ import { cn } from "@/utils/utils";
 const ERROR_MESSAGE_UPDATING_COMPONENTS = "Error updating components";
 const ERROR_MESSAGE_UPDATING_COMPONENTS_LIST = [
   "There was an error updating the components.",
-  "If the error persists, please report it on our Discord or GitHub.",
+  "Please try again or restart the application if the error persists.",
 ];
 const ERROR_MESSAGE_EDGES_LOST =
   "Some edges were lost after updating the components. Please review the flow and reconnect them.";

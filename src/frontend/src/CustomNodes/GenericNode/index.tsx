@@ -187,7 +187,7 @@ function GenericNode({
                 title: "Error updating Component code",
                 list: [
                   "There was an error updating the Component.",
-                  "If the error persists, please report it on our Discord or GitHub.",
+                  "Please try again or restart the application if the error persists.",
                 ],
               });
               console.error(error);

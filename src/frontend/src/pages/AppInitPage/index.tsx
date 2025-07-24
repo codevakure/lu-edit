@@ -14,10 +14,7 @@ import useFlowsManagerStore from "@/stores/flowsManagerStore";
 import { LoadingPage } from "../LoadingPage";
 
 export function AppInitPage() {
-  const refreshStars = useDarkStore((state) => state.refreshStars);
-  const refreshDiscordCount = useDarkStore(
-    (state) => state.refreshDiscordCount,
-  );
+
   const isLoading = useFlowsManagerStore((state) => state.isLoading);
 
   const { isFetched: isLoaded } = useCustomPrimaryLoading();
@@ -32,16 +29,11 @@ export function AppInitPage() {
     useGetBasicExamplesQuery();
 
   useEffect(() => {
-    if (isFetched) {
-      refreshStars();
-      refreshDiscordCount();
-    }
-
     if (isConfigFetched) {
       refetch();
       refetchExamples();
     }
-  }, [isFetched, isConfigFetched]);
+  }, [isConfigFetched]);
 
   return (
     //need parent component with width and height

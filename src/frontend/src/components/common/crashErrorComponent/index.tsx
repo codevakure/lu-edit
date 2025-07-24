@@ -26,16 +26,7 @@ export default function CrashErrorComponent({
             <CardContent className="grid">
               <div>
                 <p>
-                  Please report errors with detailed tracebacks on the{" "}
-                  <a
-                    href="https://github.com/langflow-ai/langflow/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium hover:underline"
-                  >
-                    GitHub Issues
-                  </a>{" "}
-                  page.
+                  An unexpected error occurred. Please try restarting the application.
                   <br></br>
                   Thank you!
                 </p>
@@ -45,16 +36,6 @@ export default function CrashErrorComponent({
             <CardFooter>
               <div className="m-auto mt-4 flex justify-center">
                 <Button onClick={resetErrorBoundary}>Restart Langflow</Button>
-
-                <a
-                  href="https://github.com/langflow-ai/langflow/issues/new"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button className="ml-3" ignoreTitleCase variant={"outline"}>
-                    Report on GitHub
-                  </Button>
-                </a>
               </div>
             </CardFooter>
           </Card>
