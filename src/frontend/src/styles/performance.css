@@ -1,0 +1,200 @@
+/* Performance optimizations for canvas and drag operations */
+
+/* Optimize GPU acceleration for ReactFlow */
+.react-flow__renderer {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.react-flow__viewport {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize node rendering during drag */
+.react-flow__node {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Disable expensive effects during drag */
+.dragging-node * {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.dragging-node .react-flow__node {
+  box-shadow: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+.dragging-node .react-flow__edge {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Optimize edge rendering */
+.react-flow__edge path {
+  will-change: d;
+}
+
+.react-flow__edge.animated path {
+  animation: none; /* Disable animations during heavy operations */
+}
+
+/* Optimize selection box */
+.react-flow__selection {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize minimap */
+.react-flow__minimap {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize controls */
+.react-flow__controls {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize background */
+.react-flow__background {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce repaints during scroll/zoom */
+.react-flow__pane {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize node content during drag - only in ReactFlow area */
+.react-flow.dragging-node .react-flow__node-default,
+.react-flow.dragging-node .react-flow__node-input,
+.react-flow.dragging-node .react-flow__node-output {
+  opacity: 0.8;
+  filter: none !important;
+  backdrop-filter: none !important;
+  /* Ensure node container doesn't affect icon positioning */
+  transform-style: flat;
+}
+
+/* Minimal transform inheritance fix - only for actual node content */
+.react-flow__node.dragging > * {
+  /* Only prevent transforms on direct children of dragging nodes */
+  transform: none;
+}
+
+/* Optimize handle rendering while preserving positioning */
+.react-flow__handle {
+  will-change: transform;
+  /* Keep handles GPU accelerated but ensure proper positioning */
+  transform: translateZ(0);
+  position: relative;
+}
+
+/* Ensure handles don't interfere with icon alignment */
+.dragging-node .react-flow__handle {
+  /* Maintain handle position during drag */
+  position: absolute;
+}
+
+/* Disable text selection globally during drag */
+body.dragging-node {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Optimize icon rendering with minimal impact - only in ReactFlow */
+.react-flow.dragging-node svg {
+  will-change: transform;
+  /* Keep GPU acceleration but only for actual dragging */
+}
+
+/* Only fix icons within the actual dragging node, not globally */
+.react-flow__node.dragging .icon-size {
+  /* Maintain dimensions only for dragging nodes */
+  transform: none;
+  position: relative;
+}
+
+/* Minimal fix for node icons during drag */
+.react-flow__node.dragging svg {
+  /* Prevent transform issues only on dragging nodes */
+  transform: none;
+}
+
+/* Performance mode for large flows */
+.performance-mode .react-flow__node {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  border-radius: 4px !important;
+}
+
+.performance-mode .react-flow__edge {
+  stroke-width: 1px !important;
+}
+
+.performance-mode .react-flow__edge.selected {
+  stroke-width: 2px !important;
+}
+
+/* Optimize virtualized nodes */
+.virtualized-node-placeholder {
+  will-change: transform;
+  transform: translateZ(0);
+  background: transparent;
+  border: 1px dashed rgba(0,0,0,0.1);
+  pointer-events: none;
+}
+
+/* Optimize loading states */
+.icon-loading {
+  will-change: opacity;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* Don't affect sidebar during drag - remove this rule */
+/* .dragging-node .sidebar {
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.1s ease;
+} */
+
+/* Don't affect toolbar during drag - remove this rule */
+/* .dragging-node .toolbar {
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.1s ease;
+} */
+
+/* GPU acceleration for frequently updated elements */
+.react-flow__node-generic,
+.react-flow__node-note {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize text rendering during drag */
+.dragging-node text,
+.dragging-node span,
+.dragging-node p {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+}
