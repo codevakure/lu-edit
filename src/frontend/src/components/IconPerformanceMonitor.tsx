@@ -52,11 +52,6 @@ const IconPerformanceMonitor = memo(({
   // Log performance metrics
   useEffect(() => {
     if (!enabled || !preloadComplete) return;
-
-    console.group('🎨 Icon Performance Stats');
-    console.log(`✅ Preloaded: ${stats.preloadedCount} icons`);
-    console.log(`⏳ Loading: ${stats.loadingCount} icons`);
-    console.log('📋 Preloaded icons:', stats.preloadedIcons);
     if (error) {
       console.error('❌ Preload error:', error);
     }

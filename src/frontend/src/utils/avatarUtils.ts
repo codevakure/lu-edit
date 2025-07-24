@@ -141,31 +141,4 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   return { valid: true };
 }
 
-/**
- * Generate SVG avatar with initials
- */
-export function generateInitialsAvatar(
-  name: string,
-  size: number = 40
-): string {
-  const initials = generateInitials(name);
-  const gradient = generateAvatarGradient(name);
-  
-  const svg = `
-    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="gradient-${name.replace(/\s+/g, '')}" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:${generateAvatarColor(name)};stop-opacity:1" />
-          <stop offset="100%" style="stop-color:${generateAvatarColor(name + 'alt')};stop-opacity:1" />
-        </linearGradient>
-      </defs>
-      <circle cx="${size/2}" cy="${size/2}" r="${size/2}" fill="url(#gradient-${name.replace(/\s+/g, '')})" />
-      <text x="${size/2}" y="${size/2}" text-anchor="middle" dominant-baseline="central" 
-            fill="white" font-family="system-ui, sans-serif" font-size="${size * 0.4}" font-weight="600">
-        ${initials}
-      </text>
-    </svg>
-  `;
-  
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
-}
+

@@ -1,4 +1,5 @@
 import React from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import { cn } from "@/utils/utils";
 import { generateInitials, generateAvatarGradient } from "@/utils/avatarUtils";
 
@@ -10,70 +11,47 @@ export interface AvatarProps {
   onClick?: () => void;
 }
 
-export const Avatar: React.FC<AvatarProps> = ({
-  name,
-  src,
-  size = 40,
-  className,
-  onClick,
-}) => {
-  const [imageError, setImageError] = React.useState(false);
-  const [imageLoaded, setImageLoaded] = React.useState(false);
-  
+const Avatar = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & AvatarProps
+>(({ name, src, size = 40, className, onClick, ...props }, ref) => {
   const initials = generateInitials(name);
   const gradient = generateAvatarGradient(name);
-  
-  const handleImageError = () => {
-    setImageError(true);
-  };
-  
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-    setImageError(false);
-  };
-  
-  const showImage = src && !imageError && imageLoaded;
-  
+
   return (
-    <div
+    <AvatarPrimitive.Root
+      ref={ref}
       className={cn(
-        "relative inline-flex items-center justify-center rounded-full overflow-hidden select-none",
+        "relative flex shrink-0 overflow-hidden rounded-full select-none",
         onClick && "cursor-pointer hover:opacity-80 transition-opacity",
         className
       )}
       style={{
         width: size,
         height: size,
-        background: showImage ? 'transparent' : gradient,
       }}
       onClick={onClick}
+      {...props}
     >
-      {src && !imageError && (
-        <img
-          src={src}
-          alt={`${name}'s avatar`}
-          className={cn(
-            "w-full h-full object-cover transition-opacity duration-200",
-            imageLoaded ? "opacity-100" : "opacity-0"
-          )}
-          onError={handleImageError}
-          onLoad={handleImageLoad}
-        />
-      )}
-      
-      {(!src || imageError || !imageLoaded) && (
-        <span
-          className="text-white font-semibold select-none"
-          style={{
-            fontSize: size * 0.4,
-            lineHeight: 1,
-          }}
-        >
-          {initials}
-        </span>
-      )}
-    </div>
+      <AvatarPrimitive.Image
+        src={src || undefined}
+        alt={`${name}'s avatar`}
+        className="aspect-square h-full w-full object-cover"
+      />
+      <AvatarPrimitive.Fallback
+        className="flex h-full w-full items-center justify-center text-white font-semibold"
+        style={{
+          background: gradient,
+          fontSize: size * 0.4,
+        }}
+      >
+        {initials}
+      </AvatarPrimitive.Fallback>
+    </AvatarPrimitive.Root>
   );
-};
+});
 
+Avatar.displayName = AvatarPrimitive.Root.displayName;
+
+export { Avatar };
 export default Avatar;

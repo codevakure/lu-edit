@@ -21,7 +21,27 @@ Completely replaced the old preloaded avatar system with a modern, performance-o
 
 ## ✅ New Avatar System
 
-### 1. Avatar Utility Functions (`/utils/avatarUtils.ts`)
+### 1. Radix UI Avatar Component (`/components/ui/avatar.tsx`)
+
+Now uses **@radix-ui/react-avatar** for better accessibility and performance:
+
+```tsx
+<Avatar 
+  name="John Doe" 
+  src={customImage} // Optional custom image
+  size={40} 
+  className="rounded-full"
+/>
+```
+
+**Benefits of Radix UI Avatar:**
+- ✅ **Accessibility**: Built-in ARIA attributes and keyboard navigation
+- ✅ **Performance**: Optimized image loading with automatic fallback
+- ✅ **Reliability**: Battle-tested component used by thousands of projects
+- ✅ **Consistency**: Matches other Radix UI components in the app
+- ✅ **Maintenance**: No custom image loading logic to maintain
+
+### 2. Avatar Utility Functions (`/utils/avatarUtils.ts`)
 
 ```typescript
 // Generate initials from username
@@ -38,16 +58,6 @@ compressImageToBase64(file, 2) // → base64 string <2KB
 // File validation
 validateImageFile(file) // → { valid: boolean, error?: string }
 ```
-
-### 2. Avatar Component (`/components/ui/avatar.tsx`)
-
-```tsx
-<Avatar 
-  name="John Doe" 
-  src={customImage} // Optional custom image
-  size={40} 
-  className="rounded-full"
-/>
 ```
 
 **Features:**

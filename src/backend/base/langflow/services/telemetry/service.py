@@ -79,12 +79,12 @@ class TelemetryService(Service):
 
     async def log_package_shutdown(self) -> None:
         payload = ShutdownPayload(time_running=(datetime.now(timezone.utc) - self._start_time).seconds)
-        await self._queue_event(payload)
+        await self._queue_event((self.send_telemetry_data, payload, "shutdown"))
 
-    async def _queue_event(self, payload) -> None:
+    async def _queue_event(self, event_tuple) -> None:
         if self.do_not_track or self._stopping:
             return
-        await self.telemetry_queue.put(payload)
+        await self.telemetry_queue.put(event_tuple)
 
     def _get_langflow_desktop(self) -> bool:
         # Coerce to bool, could be 1, 0, True, False, "1", "0", "True", "False"
