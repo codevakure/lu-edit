@@ -25,6 +25,8 @@ import LoginPage from "./pages/LoginPage";
 import FilesPage from "./pages/MainPage/pages/filesPage";
 import HomePage from "./pages/MainPage/pages/homePage";
 import CollectionPage from "./pages/MainPage/pages/main-page";
+import { DashboardPlaceholder } from "./pages/DashboardPage";
+import { LogsPlaceholder } from "./pages/LogsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ApiKeysPage from "./pages/SettingsPage/pages/ApiKeysPage";
 import GeneralPage from "./pages/SettingsPage/pages/GeneralPage";
@@ -74,10 +76,16 @@ const router = createBrowserRouter(
           >
             <Route path="" element={<AppAuthenticatedPage />}>
               <Route path="" element={<CustomDashboardWrapperPage />}>
+                <Route
+                  index
+                  element={<CustomNavigate replace to={"dashboard"} />}
+                />
+                <Route path="dashboard" element={<DashboardPlaceholder />} />
+                <Route path="logs" element={<LogsPlaceholder />} />
                 <Route path="" element={<CollectionPage />}>
                   <Route
-                    index
-                    element={<CustomNavigate replace to={"flows"} />}
+                    path="flows"
+                    element={<CustomNavigate replace to={"flows/"} />}
                   />
                   {ENABLE_FILE_MANAGEMENT && (
                     <Route path="files" element={<FilesPage />} />

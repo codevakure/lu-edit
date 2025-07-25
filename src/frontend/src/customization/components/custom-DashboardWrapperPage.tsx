@@ -1,7 +1,7 @@
-import { DashboardWrapperPage } from "@/pages/DashboardWrapperPage";
+import { VSCodeStyleLayout } from "@/pages/VSCodeStyleLayout";
 
 export const CustomDashboardWrapperPage = () => {
-  return <DashboardWrapperPage />;
+  return <VSCodeStyleLayout />;
 };
 
 export default CustomDashboardWrapperPage;

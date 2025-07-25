@@ -62,7 +62,7 @@ export default function CollectionPage(): JSX.Element {
         (flows?.length !== examples?.length || folders?.length > 1) && (
           <SideBarFoldersButtonsComponent
             handleChangeFolder={(id: string) => {
-              navigate(`all/folder/${id}`);
+              navigate(`flows/folder/${id}`);
             }}
             handleDeleteFolder={(item) => {
               setFolderToEdit(item);
