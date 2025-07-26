@@ -786,10 +786,11 @@ export default function Page({
             <MemoizedBackground />
             {helperLineEnabled && <HelperLines helperLines={helperLines} />}
           </ReactFlow>
-          <PerformanceDashboard 
+          {/* Performance Dashboard - Hidden from view but optimizations still active */}
+          {/* <PerformanceDashboard 
             virtualizationStats={virtualizationStats}
             position="bottom-right"
-          />
+          /> */}
           <div
             id="shadow-box"
             style={{
