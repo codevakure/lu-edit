@@ -13,6 +13,7 @@ import SingleAlert from "./components/singleAlertComponent";
 
 const AlertDropdown = forwardRef<HTMLDivElement, AlertDropdownType>(
   function AlertDropdown({ children, notificationRef, onClose }, ref) {
+    const [isOpen, setIsOpen] = useState(false);
     const notificationList = useAlertStore((state) => state.notificationList);
     const clearNotificationList = useAlertStore(
       (state) => state.clearNotificationList,
@@ -24,30 +25,30 @@ const AlertDropdown = forwardRef<HTMLDivElement, AlertDropdownType>(
       (state) => state.setNotificationCenter,
     );
 
-    const [open, setOpen] = useState(false);
-
-    useEffect(() => {
+    const handleOpenChange = (open: boolean) => {
+      setIsOpen(open);
+      if (open) {
+        setNotificationCenter(false);
+      }
       if (!open) {
         onClose?.();
       }
-    }, [open]);
+    };
 
     return (
       <Popover
         data-testid="notification-dropdown"
-        open={open}
-        onOpenChange={(target) => {
-          setOpen(target);
-          if (target) {
-            setNotificationCenter(false);
-          }
-        }}
+        open={isOpen}
+        onOpenChange={handleOpenChange}
       >
         <PopoverTrigger asChild>{children}</PopoverTrigger>
         <PopoverContent
           ref={notificationRef}
           data-testid="notification-dropdown-content"
           className="noflow nowheel nopan nodelete nodrag z-50 flex h-[500px] w-[500px] flex-col"
+          side="right"
+          align="start"
+          sideOffset={8}
         >
           <div className="text-md flex flex-row justify-between pl-3 font-medium text-foreground">
             Notifications
@@ -55,7 +56,7 @@ const AlertDropdown = forwardRef<HTMLDivElement, AlertDropdownType>(
               <button
                 className="text-muted-foreground hover:text-status-red"
                 onClick={() => {
-                  setOpen(false);
+                  handleOpenChange(false);
                   setTimeout(clearNotificationList, 100);
                 }}
               >
@@ -64,7 +65,7 @@ const AlertDropdown = forwardRef<HTMLDivElement, AlertDropdownType>(
               <button
                 className="text-foreground opacity-70 hover:opacity-100"
                 onClick={() => {
-                  setOpen(false);
+                  handleOpenChange(false);
                 }}
               >
                 <Cross2Icon className="h-4 w-4" />
