@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import NavigationSidebar from "@/components/core/navigationSidebar";
 import AppHeader from "@/components/core/appHeaderComponent";
 import useTheme from "@/customization/hooks/use-custom-theme";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export function ApplicationLayout() {
   useTheme();
@@ -10,22 +11,22 @@ export function ApplicationLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden">
-      {/* Header */}
-      <AppHeader />
-      
-      {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+    <SidebarProvider>
+      <div className="flex h-screen w-full">
         {/* Navigation Sidebar */}
         <NavigationSidebar />
         
-        {/* Main Content */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Main Content Area */}
+        <SidebarInset className="flex flex-1 flex-col overflow-hidden bg-muted/30 rounded-tl-lg">
+          {/* Header */}
+          <AppHeader />
+          
+          {/* Main Content */}
           <div className="flex-1 overflow-y-auto">
             <Outlet />
           </div>
-        </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

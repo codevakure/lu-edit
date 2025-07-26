@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import DataStaxLogo from "@/assets/DataStaxLogo.svg?react";
-import LangflowLogo from "@/assets/LangflowLogo.svg?react";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Search } from "lucide-react";
 
 import { CustomOrgSelector } from "@/customization/components/custom-org-selector";
 import { CustomProductSelector } from "@/customization/components/custom-product-selector";
@@ -15,42 +16,32 @@ export default function AppHeader(): JSX.Element {
   useTheme();
 
   return (
-    <div
-      className={`z-10 flex h-[48px] w-full items-center justify-between border-b px-6 dark:bg-background`}
-      data-testid="app-header"
-    >
-      {/* Left Section */}
-      <div
-        className={`z-30 flex shrink-0 items-center gap-2`}
-        data-testid="header_left_section_wrapper"
+    <header className="bg-background flex h-12 items-center gap-3 px-3 py-1 sm:gap-4">
+      <SidebarTrigger variant="outline" className="scale-125 sm:scale-100" />
+      <Separator orientation="vertical" className="h-6" />
+      
+      {/* Selectors (only if DataStax is enabled) */}
+      {ENABLE_DATASTAX_LANGFLOW && (
+        <div className="flex items-center gap-2">
+          <CustomOrgSelector />
+          <CustomProductSelector />
+        </div>
+      )}
+
+      {/* Search Bar */}
+      <Button
+        variant="outline"
+        className="bg-muted/25 text-muted-foreground hover:bg-muted/50 relative h-8 w-full flex-1 justify-start rounded-md text-sm font-normal shadow-none sm:pr-12 md:w-40 md:flex-none lg:w-56 xl:w-64"
       >
-        <Button
-          unstyled
-          onClick={() => navigate("/")}
-          className="mr-1 flex h-8 w-8 items-center"
-          data-testid="icon-ChevronLeft"
-        >
-          {ENABLE_DATASTAX_LANGFLOW ? (
-            <DataStaxLogo className="fill-black dark:fill-[white]" />
-          ) : (
-            <LangflowLogo className="h-6 w-6" />
-          )}
-        </Button>
-        {ENABLE_DATASTAX_LANGFLOW && (
-          <>
-            <CustomOrgSelector />
-            <CustomProductSelector />
-          </>
-        )}
-      </div>
+        <Search className="absolute top-1/2 left-1.5 -translate-y-1/2 h-4 w-4" />
+        <span className="ml-3">Search flows...</span>
+        <kbd className="bg-muted pointer-events-none absolute top-[0.3rem] right-[0.3rem] hidden h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </Button>
 
-      {/* Middle Section */}
-      <div className="absolute left-1/2 -translate-x-1/2">
-        <FlowMenu />
-      </div>
-
-      {/* Right Section - Empty since alerts and user moved to sidebar */}
-      <div className="w-0"></div>
-    </div>
+      {/* Flow Menu */}
+      <FlowMenu />
+    </header>
   );
 }

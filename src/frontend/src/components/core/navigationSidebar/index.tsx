@@ -1,72 +1,190 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
-import AlertDropdown from "@/alerts/alertDropDown";
-import { ForwardedIconComponent } from "@/components/common/genericIconComponent";
-import ShadTooltip from "@/components/common/shadTooltipComponent";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { useContext, useRef } from "react";
+import { useLocation, Link } from "react-router-dom";
+import DataStaxLogo from "@/assets/DataStaxLogo.svg?react";
+import LangflowLogo from "@/assets/LangflowLogo.svg?react";
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+  Bell, 
+  BookOpen, 
+  Bot,
+  ChevronRight,
+  ChevronsUpDown, 
+  Database,
+  FileText,
+  Folder,
+  GitBranch,
+  Home,
+  LogOut, 
+  MessageSquare,
+  Package,
+  Palette,
+  Settings, 
+  Shield,
+  Star,
+  Terminal,
+  Users,
+  Workflow,
+  Zap
+} from "lucide-react";
+
+import { 
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Avatar from "@/components/ui/avatar";
-import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
-import { AuthContext } from "@/contexts/authContext";
-import useAlertStore from "@/stores/alertStore";
-import useAuthStore from "@/stores/authStore";
-import { useDarkStore } from "@/stores/darkStore";
+
+import AlertDropdown from "@/alerts/alertDropDown";
+import ThemeButtons from "@/components/core/appHeaderComponent/components/ThemeButtons";
 import { useLogout } from "@/controllers/API/queries/auth";
+import { useCustomNavigate } from "@/customization/hooks/use-custom-navigate";
+import useAlertStore from "@/stores/alertStore";
+import { AuthContext } from "@/contexts/authContext";
+import { useDarkStore } from "@/stores/darkStore";
+import useAuthStore from "@/stores/authStore";
+import { ForwardedIconComponent } from "@/components/common/genericIconComponent";
+import { stripReleaseStageFromVersion } from "@/utils/utils";
 import { DOCS_URL, DATASTAX_DOCS_URL } from "@/constants/constants";
 import { ENABLE_DATASTAX_LANGFLOW } from "@/customization/feature-flags";
-import { stripReleaseStageFromVersion } from "@/utils/utils";
-import ThemeButtons from "@/components/core/appHeaderComponent/components/ThemeButtons";
-import { cn } from "@/utils/utils";
 
-interface NavigationItem {
-  id: string;
-  icon: string;
-  label: string;
-  path: string;
-}
-
-const navigationItems: NavigationItem[] = [
+const navigationItems = [
   {
     id: "explorer",
-    icon: "Home",
+    icon: Home,
     label: "Explorer",
     path: "/dashboard",
   },
   {
-    id: "playground",
-    icon: "MessageSquare",
+    id: "playground", 
+    icon: MessageSquare,
     label: "Playground",
     path: "/chat",
   },
   {
     id: "components",
-    icon: "Bot",
-    label: "Components",
+    icon: Bot,
+    label: "Components", 
     path: "/agents",
   },
   {
     id: "workspace",
-    icon: "Workflow",
+    icon: Workflow,
     label: "Workspace",
     path: "/flows",
+  },
+];
+
+const projectItems = [
+  {
+    id: "projects",
+    icon: Folder,
+    label: "Projects",
+    items: [
+      { id: "all-projects", label: "All Projects", path: "/projects" },
+      { id: "my-projects", label: "My Projects", path: "/projects/mine" },
+      { id: "shared-projects", label: "Shared", path: "/projects/shared" },
+      { id: "templates", label: "Templates", path: "/projects/templates" },
+    ]
+  },
+  {
+    id: "data",
+    icon: Database,
+    label: "Data Sources",
+    items: [
+      { id: "databases", label: "Databases", path: "/data/databases" },
+      { id: "apis", label: "APIs", path: "/data/apis" },
+      { id: "files", label: "Files", path: "/data/files" },
+      { id: "streams", label: "Streams", path: "/data/streams" },
+    ]
+  },
+  {
+    id: "tools",
+    icon: Package,
+    label: "Tools",
+    items: [
+      { id: "integrations", label: "Integrations", path: "/tools/integrations" },
+      { id: "extensions", label: "Extensions", path: "/tools/extensions" },
+      { id: "plugins", label: "Plugins", path: "/tools/plugins" },
+    ]
+  }
+];
+
+const platformItems = [
+  {
+    id: "analytics",
+    icon: Zap,
+    label: "Analytics",
+    path: "/analytics",
+  },
+  {
+    id: "monitoring",
+    icon: Terminal,
+    label: "Monitoring",
+    path: "/monitoring",
+  },
+  {
+    id: "users",
+    icon: Users,
+    label: "User Management",
+    path: "/users",
+  },
+  {
+    id: "docs",
+    icon: FileText,
+    label: "Documentation",
+    path: "/docs",
+  },
+  {
+    id: "themes",
+    icon: Palette,
+    label: "Themes",
+    path: "/themes",
+  },
+  {
+    id: "deployment",
+    icon: GitBranch,
+    label: "Deployment",
+    path: "/deployment",
+  },
+  {
+    id: "favorites",
+    icon: Star,
+    label: "Favorites",
+    path: "/favorites",
   },
 ];
 
 const NavigationSidebar = () => {
   const location = useLocation();
   const navigate = useCustomNavigate();
-  const [isExpanded, setIsExpanded] = useState(false);
   const { userData } = useContext(AuthContext);
   const { mutate: mutationLogout } = useLogout();
   const version = useDarkStore((state) => state.version);
   const latestVersion = useDarkStore((state) => state.latestVersion);
+  const { state: sidebarState, setOpenMobile } = useSidebar();
   
   const { isAdmin, autoLogin } = useAuthStore((state) => ({
     isAdmin: state.isAdmin,
@@ -89,14 +207,25 @@ const NavigationSidebar = () => {
   })();
 
   const getIsActive = (path: string) => {
+    const currentPath = location.pathname;
+    
     if (path === "/dashboard") {
-      return location.pathname === "/" || location.pathname === "/dashboard";
+      return currentPath === "/" || currentPath === "/dashboard";
     }
-    return location.pathname.startsWith(path);
-  };
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
+    
+    // For /flows, also check /workspace route since they might be the same
+    if (path === "/flows") {
+      return currentPath === "/flows" || 
+             currentPath.startsWith("/flows/") ||
+             currentPath === "/workspace" ||
+             currentPath.startsWith("/workspace/");
+    }
+    
+    // Check exact match first
+    if (currentPath === path) return true;
+    
+    // Check if current path starts with the item path (for nested routes)
+    return currentPath.startsWith(path + "/") || currentPath.startsWith(path);
   };
 
   const profileImage = userData?.profile_image?.startsWith('data:') 
@@ -105,183 +234,229 @@ const NavigationSidebar = () => {
   const userName = userData?.username || "User";
 
   return (
-    <div 
-      className={cn(
-        "flex h-full flex-col bg-zinc-900 border-r border-zinc-800 transition-all duration-300",
-        isExpanded ? "w-48" : "w-12"
-      )}
-    >
-      {/* Toggle Button */}
-      <div className="p-1 border-b border-zinc-800">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleExpanded}
-          className="h-10 w-10 rounded-md text-foreground hover:bg-muted"
-        >
-          <ForwardedIconComponent
-            name={isExpanded ? "PanelLeftClose" : "PanelRightOpen"}
-            className="h-5 w-5"
-          />
-        </Button>
-      </div>
-
-      {/* Navigation Items */}
-      <div className={cn(
-        "flex flex-col gap-1 py-1 flex-1",
-        isExpanded ? "px-2" : "px-1"
-      )}>
-        {navigationItems.map((item) => {
-          const isActive = getIsActive(item.path);
-          
-          if (isExpanded) {
-            return (
-              <Button
-                key={item.id}
-                variant="ghost"
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  "h-9 w-auto justify-start gap-3 rounded-md transition-colors text-sm font-medium px-2 text-left mx-1",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-muted"
-                )}
-                data-testid={`nav-sidebar-${item.id}`}
-              >
-                <ForwardedIconComponent
-                  name={item.icon}
-                  className="h-4 w-4 flex-shrink-0"
-                />
-                <span className="flex-1 text-left">{item.label}</span>
-              </Button>
-            );
-          }
-
-          return (
-            <ShadTooltip
-              key={item.id}
-              content={item.label}
-              side="right"
-              delayDuration={500}
+    <Sidebar collapsible="icon" variant="floating">
+      <SidebarHeader>
+        {/* Logo and Brand */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              size="lg" 
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              asChild
             >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  "h-10 w-10 rounded-md transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-muted"
-                )}
-                data-testid={`nav-sidebar-${item.id}`}
-              >
-                <ForwardedIconComponent
-                  name={item.icon}
-                  className="h-5 w-5"
-                />
-              </Button>
-            </ShadTooltip>
-          );
-        })}
-      </div>
-
-      {/* Bottom Section - Notifications and User */}
-      <div className={cn(
-        "border-t border-zinc-800 p-1 pb-3",
-        isExpanded ? "px-2" : "px-1"
-      )}>
-        {/* Notifications */}
-        <div className="mb-1">
-          <AlertDropdown
-            notificationRef={notificationContentRef}
-          >
-            {isExpanded ? (
-              <Button
-                variant="ghost"
-                className={cn(
-                  "h-9 w-full justify-start gap-3 rounded-md transition-colors text-sm font-medium px-2 text-left mx-1",
-                  "text-foreground hover:bg-muted"
-                )}
-                data-testid="nav-sidebar-notifications"
-              >
-                <div className="relative">
-                  <ForwardedIconComponent
-                    name="Bell"
-                    className="h-4 w-4 flex-shrink-0"
-                  />
-                  {notificationCenter && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500" />
+              <Link to="/" onClick={() => setOpenMobile(false)}>
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  {ENABLE_DATASTAX_LANGFLOW ? (
+                    <DataStaxLogo className="size-5 fill-current" />
+                  ) : (
+                    <LangflowLogo className="size-5" />
                   )}
                 </div>
-                <span className="flex-1 text-left">Notifications</span>
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-10 w-10 rounded-md transition-colors relative",
-                  "text-foreground hover:bg-muted"
-                )}
-                data-testid="nav-sidebar-notifications"
-                title="Notifications"
-              >
-                <ForwardedIconComponent
-                  name="Bell"
-                  className="h-5 w-5"
-                />
-                {notificationCenter && (
-                  <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500" />
-                )}
-              </Button>
-            )}
-          </AlertDropdown>
-        </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    {ENABLE_DATASTAX_LANGFLOW ? "DataStax" : "Langflow"}
+                  </span>
+                  <span className="truncate text-xs">Flow Builder</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        {/* Separator */}
-        <div className="my-2">
-          <Separator className="bg-zinc-700" />
-        </div>
+      <SidebarContent>
+        {/* Main Navigation Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarMenu>
+            {navigationItems.map((item) => {
+              const isActive = getIsActive(item.path);
+              return (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.label}
+                    className={isActive ? "bg-primary text-primary-foreground" : ""}
+                  >
+                    <Link to={item.path} onClick={() => setOpenMobile(false)}>
+                      <item.icon className="size-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
 
-        {/* User Profile */}
-        <div className="mb-1">
-          {isExpanded ? (
+        {/* Project Management Group with Dropdowns */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Project Management</SidebarGroupLabel>
+          <SidebarMenu>
+            {projectItems.map((item) => {
+              const isActive = item.items.some(subItem => getIsActive(subItem.path));
+              
+              // When collapsed, show as dropdown menu
+              if (sidebarState === 'collapsed') {
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton
+                          tooltip={item.label}
+                          className={isActive ? "bg-primary text-primary-foreground" : ""}
+                        >
+                          <item.icon className="size-4" />
+                          <span>{item.label}</span>
+                          <ChevronRight className="ml-auto size-4" />
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start" sideOffset={4}>
+                        <DropdownMenuLabel>{item.label}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {item.items.map((subItem) => (
+                          <DropdownMenuItem key={subItem.id} asChild>
+                            <Link to={subItem.path} className={getIsActive(subItem.path) ? 'bg-secondary' : ''} onClick={() => setOpenMobile(false)}>
+                              <span>{subItem.label}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                );
+              }
+              
+              // When expanded, show as collapsible
+              return (
+                <Collapsible
+                  key={item.id}
+                  asChild
+                  defaultOpen={isActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.label} className={isActive ? "bg-primary text-primary-foreground" : ""}>
+                        <item.icon className="size-4" />
+                        <span>{item.label}</span>
+                        <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.id}>
+                            <SidebarMenuSubButton asChild className={getIsActive(subItem.path) ? "bg-primary text-primary-foreground" : ""}>
+                              <Link to={subItem.path} onClick={() => setOpenMobile(false)}>
+                                <span>{subItem.label}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Platform Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarMenu>
+            {platformItems.map((item) => {
+              const isActive = getIsActive(item.path);
+              return (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.label}
+                    className={isActive ? "bg-primary text-primary-foreground" : ""}
+                  >
+                    <Link to={item.path} onClick={() => setOpenMobile(false)}>
+                      <item.icon className="size-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Tools Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <AlertDropdown notificationRef={notificationContentRef}>
+                <SidebarMenuButton tooltip="Notifications">
+                  <div className="relative">
+                    <Bell className="size-4" />
+                    {notificationCenter && (
+                      <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
+                    )}
+                  </div>
+                  <span>Notifications</span>
+                </SidebarMenuButton>
+              </AlertDropdown>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        {/* User Menu */}
+        <SidebarMenu>
+          <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="h-9 w-full flex items-center gap-3 rounded-md px-3 mx-1 hover:bg-muted/50 cursor-pointer transition-colors">
-                  <Avatar
-                    name={userName}
-                    src={profileImage}
-                    size={24}
-                    className="flex-shrink-0"
-                  />
-                  <span className="flex-1 text-left truncate text-sm text-foreground">{userName}</span>
-                  <ForwardedIconComponent
-                    name="ChevronUp"
-                    className="h-4 w-4 flex-shrink-0"
-                  />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                className="w-64" 
-                side="right" 
-                align="end"
-                sideOffset={8}
-              >
-                {/* User Info */}
-                <div className="flex items-center gap-3 p-3">
-                  <Avatar
-                    name={userName}
-                    src={profileImage}
-                    size={32}
-                    className="flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-                    <p className="text-xs text-muted-foreground truncate">User Account</p>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted">
+                    {profileImage ? (
+                      <img src={profileImage} alt={userName} className="size-6 rounded-lg" />
+                    ) : (
+                      <span className="text-xs font-bold text-muted-foreground">
+                        {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </span>
+                    )}
                   </div>
-                </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">{userName}</span>
+                    <span className="truncate text-xs">User Account</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side="right"
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted">
+                      {profileImage ? (
+                        <img src={profileImage} alt={userName} className="size-6 rounded-lg" />
+                      ) : (
+                        <span className="text-xs font-bold text-muted-foreground">
+                          {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">{userName}</span>
+                      <span className="truncate text-xs">User Account</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
                 
                 <DropdownMenuSeparator />
                 
@@ -299,30 +474,31 @@ const NavigationSidebar = () => {
                 
                 <DropdownMenuSeparator />
                 
-                {/* Menu Items */}
-                <DropdownMenuItem onClick={() => navigate("/settings")}>
-                  <ForwardedIconComponent name="Settings" className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                
-                {isAdmin && !autoLogin && (
-                  <DropdownMenuItem onClick={() => navigate("/admin")}>
-                    <ForwardedIconComponent name="Shield" className="mr-2 h-4 w-4" />
-                    Admin Page
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => { navigate("/settings"); setOpenMobile(false); }}>
+                    <Settings className="mr-2 size-4" />
+                    Settings
                   </DropdownMenuItem>
-                )}
-                
-                <DropdownMenuItem asChild>
-                  <a
-                    href={ENABLE_DATASTAX_LANGFLOW ? DATASTAX_DOCS_URL : DOCS_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="cursor-pointer"
-                  >
-                    <ForwardedIconComponent name="BookOpen" className="mr-2 h-4 w-4" />
-                    Documentation
-                  </a>
-                </DropdownMenuItem>
+                  
+                  {isAdmin && !autoLogin && (
+                    <DropdownMenuItem onClick={() => { navigate("/admin"); setOpenMobile(false); }}>
+                      <Shield className="mr-2 size-4" />
+                      Admin Page
+                    </DropdownMenuItem>
+                  )}
+                  
+                  <DropdownMenuItem asChild>
+                    <a
+                      href={ENABLE_DATASTAX_LANGFLOW ? DATASTAX_DOCS_URL : DOCS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cursor-pointer"
+                    >
+                      <BookOpen className="mr-2 size-4" />
+                      Documentation
+                    </a>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
                 
                 <DropdownMenuSeparator />
                 
@@ -335,116 +511,19 @@ const NavigationSidebar = () => {
                 {!autoLogin && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                      <ForwardedIconComponent name="LogOut" className="mr-2 h-4 w-4" />
-                      Logout
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 size-4" />
+                      Log out
                     </DropdownMenuItem>
                   </>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <ShadTooltip
-              content={userName}
-              side="right"
-              delayDuration={500}
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex justify-center p-1">
-                    <Avatar
-                      name={userName}
-                      src={profileImage}
-                      size={28}
-                      className="cursor-pointer hover:opacity-80 transition-opacity"
-                    />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  className="w-64" 
-                  side="right" 
-                  align="center"
-                  sideOffset={8}
-                >
-                  {/* User Info */}
-                  <div className="flex items-center gap-3 p-3">
-                    <Avatar
-                      name={userName}
-                      src={profileImage}
-                      size={32}
-                      className="flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-                      <p className="text-xs text-muted-foreground truncate">User Account</p>
-                    </div>
-                  </div>
-                  
-                  <DropdownMenuSeparator />
-                  
-                  {/* Version Info */}
-                  <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-sm text-muted-foreground">Version</span>
-                    <span className={`text-xs ${
-                      isLatestVersion 
-                        ? "text-emerald-600 dark:text-emerald-400" 
-                        : "text-amber-600 dark:text-amber-400"
-                    }`}>
-                      {version} {isLatestVersion ? "(latest)" : "(update available)"}
-                    </span>
-                  </div>
-                  
-                  <DropdownMenuSeparator />
-                  
-                  {/* Menu Items */}
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
-                    <ForwardedIconComponent name="Settings" className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  
-                  {isAdmin && !autoLogin && (
-                    <DropdownMenuItem onClick={() => navigate("/admin")}>
-                      <ForwardedIconComponent name="Shield" className="mr-2 h-4 w-4" />
-                      Admin Page
-                    </DropdownMenuItem>
-                  )}
-                  
-                  <DropdownMenuItem asChild>
-                    <a
-                      href={ENABLE_DATASTAX_LANGFLOW ? DATASTAX_DOCS_URL : DOCS_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="cursor-pointer"
-                    >
-                      <ForwardedIconComponent name="BookOpen" className="mr-2 h-4 w-4" />
-                      Documentation
-                    </a>
-                  </DropdownMenuItem>
-                  
-                  <DropdownMenuSeparator />
-                  
-                  {/* Theme */}
-                  <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-sm text-muted-foreground">Theme</span>
-                    <ThemeButtons />
-                  </div>
-                  
-                  {!autoLogin && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                        <ForwardedIconComponent name="LogOut" className="mr-2 h-4 w-4" />
-                        Logout
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </ShadTooltip>
-          )}
-        </div>
-      </div>
-    </div>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 };
 
